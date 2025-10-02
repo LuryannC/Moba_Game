@@ -2,3 +2,25 @@
 
 
 #include "Crunch/Public/Player/CPlayerController.h"
+
+#include "Player/CPlayerCharacter.h"
+
+void ACPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	CPlayerCharacter = Cast<ACPlayerCharacter>(InPawn);
+	if (CPlayerCharacter)
+	{
+		CPlayerCharacter->ServerSideInit();
+	}
+}
+
+void ACPlayerController::AcknowledgePossession(class APawn* P)
+{
+	Super::AcknowledgePossession(P);
+	CPlayerCharacter = Cast<ACPlayerCharacter>(P);
+	if (CPlayerCharacter)
+	{
+		CPlayerCharacter->ClientSideInit();
+	}
+}
