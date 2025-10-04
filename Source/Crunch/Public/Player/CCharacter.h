@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "CCharacter.generated.h"
 
+class UWidgetComponent;
 class UCAttributeSet;
 class UCAbilitySystemComponent;
 
@@ -20,6 +21,10 @@ public:
 	ACCharacter();
 	void ServerSideInit();
 	void ClientSideInit();
+	bool IsLocallyControlledByPlayer() const;
+
+	// Only called on server
+	virtual void PossessedBy(AController* NewController) override;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -43,4 +48,21 @@ private:
 	TObjectPtr<UCAbilitySystemComponent> CAbilitySystemComponent;
 	UPROPERTY()
 	TObjectPtr<UCAttributeSet> CAttributeSet;
+
+	/**************************************************************/
+	/*                            UI                              */
+	/**************************************************************/
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category="Gameplay Ability")
+	TObjectPtr<UWidgetComponent> OverHeadWidgetComponent;
+	void ConfigureOverHeadWidget();
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	float HeadStatGaugeVisibilityUpdateRate = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	float HeadStatGaugeVisibilityRangeSquared = 10000000.f;
+	
+	FTimerHandle StatGaugeVisibilityUpdateTimerHandle;
+	void UpdateStatGaugeVisibility();
 };
