@@ -6,6 +6,7 @@
 #include "CCharacter.h"
 #include "CPlayerCharacter.generated.h"
 
+enum class ECAbilityInputID : uint8;
 class UInputAction;
 class UInputComponent;
 class UInputMappingContext;
@@ -32,15 +33,20 @@ public:
 
 private:
 
-	void LookAction(const FInputActionValue& InputActionValue);
-	void MoveAction(const FInputActionValue& InputActionValue);
-	
 	UPROPERTY(VisibleDefaultsOnly, Category="View")
 	TObjectPtr<class USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleDefaultsOnly, Category="View")
 	TObjectPtr<class UCameraComponent> ViewCamera;
+	
+	FVector GetLookRightDirection() const;
+	FVector GetLookForwardDirection() const;
+	FVector GetMoveForwardDirection() const;
 
+	/**************************************************************/
+	/*                           Input                            */ 
+	/**************************************************************/
+private:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> JumpInputAction;
 
@@ -51,9 +57,12 @@ private:
 	TObjectPtr<UInputAction> MoveInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputMappingContext> GameplayInputMappingContext;
+	TMap<ECAbilityInputID, UInputAction*> GameplayAbilityInputActions;
 
-	FVector GetLookRightDirection() const;
-	FVector GetLookForwardDirection() const;
-	FVector GetMoveForwardDirection() const;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputMappingContext> GameplayInputMappingContext;
+	
+	void LookAction(const FInputActionValue& InputActionValue);
+	void MoveAction(const FInputActionValue& InputActionValue);
+	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
 };

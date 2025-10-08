@@ -31,6 +31,7 @@ void ACCharacter::ServerSideInit()
 {
 	CAbilitySystemComponent.Get()->InitAbilityActorInfo(this, this);
 	CAbilitySystemComponent.Get()->ApplyInitialEffects();
+	CAbilitySystemComponent.Get()->GrantInitialAbilities();
 }
 
 void ACCharacter::ClientSideInit()
@@ -55,7 +56,7 @@ UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
 
 bool ACCharacter::IsLocallyControlledByPlayer() const
 {
-	return GetController() && GetController()->IsLocalPlayerController();
+	return GetLocalRole() == ROLE_AutonomousProxy || GetRemoteRole() == ROLE_AutonomousProxy;
 }
 
 void ACCharacter::PossessedBy(AController* NewController)

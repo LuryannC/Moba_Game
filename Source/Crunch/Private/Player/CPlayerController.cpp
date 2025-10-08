@@ -29,7 +29,7 @@ void ACPlayerController::AcknowledgePossession(class APawn* P)
 
 void ACPlayerController::SpawnGameplayWidget()
 {
-	if (!IsLocalController())
+	if (!IsLocalPlayerController())
 	{
 		return;
 	}

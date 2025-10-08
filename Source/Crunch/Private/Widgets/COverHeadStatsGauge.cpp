@@ -9,7 +9,7 @@
 
 void UCOverHeadStatsGauge::ConfigureWithASC(UAbilitySystemComponent* AbilitySystemComponent) const
 {
-	AbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
+	//AbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 	if (AbilitySystemComponent)
 	{
 		HealthBar.Get()->SetAndBoundToGameplayAttributes(AbilitySystemComponent, UCAttributeSet::GetHealthAttribute(), UCAttributeSet::GetMaxHealthAttribute());

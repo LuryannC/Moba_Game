@@ -47,3 +47,22 @@ void UCAbilitySystemComponent::ApplyInitialEffects()
 	}
 }
 
+void UCAbilitySystemComponent::GrantInitialAbilities()
+{
+	if (!GetOwner() || !GetOwner()->HasAuthority())
+	{
+		return;
+	}
+	
+	for (const TPair<ECAbilityInputID, TSubclassOf<UCGameplayAbility>>& AbilityPair : Abilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityPair.Value, 0, (int32)AbilityPair.Key, nullptr);
+		GiveAbility(AbilitySpec);
+	}
+
+	for (const TPair<ECAbilityInputID, TSubclassOf<UCGameplayAbility>>& AbilityPair : BasicAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityPair.Value, 0, (int32)AbilityPair.Key, nullptr);
+		GiveAbility(AbilitySpec);
+	}
+}
