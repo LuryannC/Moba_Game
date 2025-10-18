@@ -16,6 +16,7 @@ public class Crunch : ModuleRules
 			"InputCore", 
 			"EnhancedInput", 
 			"GameplayAbilities",
+			"AIModule"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -24,7 +25,7 @@ public class Crunch : ModuleRules
 			"GameplayTasks",
 			"UMG",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
 		});
 
 		// Uncomment if you are using Slate UI

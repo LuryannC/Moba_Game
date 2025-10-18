@@ -21,11 +21,21 @@ public:
 
 	void ApplyInitialEffects();
 	void GrantInitialAbilities();
+	void ApplyFullStatEffect();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	void AuthApplyGameplayEffect(const TSubclassOf<UGameplayEffect>& EffectToApply, int Level = 1);
+	void HealthUpdated(const FOnAttributeChangeData& ChangedData);
+	
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
+	TSubclassOf<UGameplayEffect> FullStatEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
+	TSubclassOf<UGameplayEffect> DeathEffect;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects")
 	TArray<TSubclassOf<UGameplayEffect>> InitialEffects;
 

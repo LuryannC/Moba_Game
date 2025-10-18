@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 #include "CCharacter.generated.h"
 
@@ -12,7 +14,7 @@ class UCAttributeSet;
 class UCAbilitySystemComponent;
 
 UCLASS()
-class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface
+class CRUNCH_API ACCharacter : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -25,6 +27,8 @@ public:
 
 	// Only called on server
 	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -44,6 +48,9 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 private:
+	void BindGASChangeDelegates();
+	void OnDeath(const FGameplayTag Tag, int32 NewCount);
+	
 	UPROPERTY(VisibleDefaultsOnly, Category="Gameplay Ability")
 	TObjectPtr<UCAbilitySystemComponent> CAbilitySystemComponent;
 	UPROPERTY()
@@ -65,4 +72,42 @@ private:
 	
 	FTimerHandle StatGaugeVisibilityUpdateTimerHandle;
 	void UpdateStatGaugeVisibility();
+
+	void SetStatusGaugeEnabled(bool bIsEnabled);
+	/**************************************************************/
+	/*                       Death and respawn                    */
+	/**************************************************************/
+
+	FTransform RelativeMeshTransform;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Death")
+	float DeathMontageFinishTimeShift = -0.8f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Death")
+	TObjectPtr<UAnimMontage> DeathMontage;
+
+	FTimerHandle DeathMontageTimerHandle;
+	void OnDeathMontageFinished();
+	void SetRagdollEnabled(bool bIsEnabled);
+
+	void PlayDeathAnimation();
+	
+	void StartDeathSequence();
+	void Respawn();
+
+	virtual void OnDeath();
+	virtual void OnRespawn();
+
+	/**************************************************************/
+	/*                            Teamd                           */
+	/**************************************************************/
+public:
+	// ~ Start of IGenericTeamAgentInterface
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	// ~ End of IGenericTeamAgentInterface
+
+private:
+	UPROPERTY(Replicated)
+	FGenericTeamId TeamId;
 };

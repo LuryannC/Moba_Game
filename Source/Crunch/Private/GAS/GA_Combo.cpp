@@ -126,7 +126,7 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 
 void UGA_Combo::DoDamage(FGameplayEventData Data)
 {
-	TArray<FHitResult> HitResults = GetHitResultsFromSweepLocationTargetData(Data.TargetData, SweepSphereRadius, bDrawDebug, true);
+	TArray<FHitResult> HitResults = GetHitResultsFromSweepLocationTargetData(Data.TargetData, SweepSphereRadius);
 
 	for (const auto& HitResult : HitResults)
 	{

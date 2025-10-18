@@ -6,10 +6,12 @@
 
 namespace CGameplayTags
 {
+
+	// Character
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Dead);
+	
 	// Abilities
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(BasicAttack);
-
-	
 	
 	// Combo
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Change);

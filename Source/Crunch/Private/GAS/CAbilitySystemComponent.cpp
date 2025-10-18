@@ -3,15 +3,13 @@
 
 #include "GAS/CAbilitySystemComponent.h"
 
+#include "GAS/CAttributeSet.h"
+
 
 // Sets default values for this component's properties
 UCAbilitySystemComponent::UCAbilitySystemComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetHealthAttribute()).AddUObject(this, &UCAbilitySystemComponent::HealthUpdated);
 }
 
 
@@ -19,9 +17,28 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 void UCAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	// ...
-	
+void UCAbilitySystemComponent::AuthApplyGameplayEffect(const TSubclassOf<UGameplayEffect>& EffectToApply, int Level)
+{
+	if (GetOwner() && GetOwner()->HasAuthority())
+	{
+		const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(EffectToApply, Level, MakeEffectContext());
+		ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	}
+}
+
+void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& ChangedData)
+{
+	if (!GetOwner())
+	{
+		return;
+	}
+
+	if (ChangedData.NewValue <= 0 && GetOwner()->HasAuthority() && DeathEffect)
+	{
+		AuthApplyGameplayEffect(DeathEffect);
+	}
 }
 
 
@@ -42,8 +59,7 @@ void UCAbilitySystemComponent::ApplyInitialEffects()
 	
 	for (const TSubclassOf<UGameplayEffect>& EffectClass : InitialEffects)
 	{
-		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(EffectClass, 1, MakeEffectContext());
-		ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+		AuthApplyGameplayEffect(EffectClass);
 	}
 }
 
@@ -65,4 +81,9 @@ void UCAbilitySystemComponent::GrantInitialAbilities()
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityPair.Value, 0, (int32)AbilityPair.Key, nullptr);
 		GiveAbility(AbilitySpec);
 	}
+}
+
+void UCAbilitySystemComponent::ApplyFullStatEffect()
+{
+	AuthApplyGameplayEffect(FullStatEffect);
 }

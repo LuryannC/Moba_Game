@@ -4,9 +4,12 @@
 
 namespace CGameplayTags
 {
+
+	// Character
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Dead, "Status.Dead", "Given to when character is dead");
+	
 	// Abilities
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(BasicAttack, "Ability.BasicAttack", "BasicAttack");
-
 
 	// Combo
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Change, "Ability.Combo.Change", "Change group");

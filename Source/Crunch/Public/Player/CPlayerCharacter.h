@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CCharacter.h"
+#include "GenericTeamAgentInterface.h"
 #include "CPlayerCharacter.generated.h"
 
 enum class ECAbilityInputID : uint8;
@@ -65,4 +66,8 @@ private:
 	void LookAction(const FInputActionValue& InputActionValue);
 	void MoveAction(const FInputActionValue& InputActionValue);
 	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
+
+
+	virtual void OnDeath() override;
+	virtual void OnRespawn() override;
 };
