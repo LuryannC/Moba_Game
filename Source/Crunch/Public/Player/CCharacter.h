@@ -77,7 +77,10 @@ private:
 	/**************************************************************/
 	/*                       Death and respawn                    */
 	/**************************************************************/
-
+public:
+	bool IsDead() const;
+	void RespawnImmediately();
+private:
 	FTransform RelativeMeshTransform;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Death")
@@ -99,7 +102,7 @@ private:
 	virtual void OnRespawn();
 
 	/**************************************************************/
-	/*                            Teamd                           */
+	/*                            Team                           */
 	/**************************************************************/
 public:
 	// ~ Start of IGenericTeamAgentInterface
@@ -108,6 +111,20 @@ public:
 	// ~ End of IGenericTeamAgentInterface
 
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing= OnRep_TeamID)
 	FGenericTeamId TeamId;
+
+	UFUNCTION()
+	virtual void OnRep_TeamID();
+
+	/**************************************************************/
+	/*                            AI                              */
+	/**************************************************************/
+private:
+	void SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled);
+	
+	UPROPERTY()
+	TObjectPtr<class UAIPerceptionStimuliSourceComponent> PerceptionStimuliSourceComponent;
+
+public:
 };

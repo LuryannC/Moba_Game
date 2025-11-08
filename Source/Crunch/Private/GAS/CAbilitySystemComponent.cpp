@@ -24,7 +24,10 @@ void UCAbilitySystemComponent::AuthApplyGameplayEffect(const TSubclassOf<UGamepl
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
 		const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(EffectToApply, Level, MakeEffectContext());
-		ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+		if (EffectSpecHandle.IsValid())
+		{
+			ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+		}
 	}
 }
 

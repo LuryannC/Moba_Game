@@ -12,6 +12,11 @@ void UCValueGauge::NativePreConstruct()
 	Super::NativePreConstruct();
 
 	ProgressBar.Get()->SetFillColorAndOpacity(BarColour);
+
+	ValueText->SetFont(ValueTextFont);
+	
+	ValueText->SetVisibility(bValueTextVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	ProgressBar->SetVisibility(bProgressBarVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void UCValueGauge::SetAndBoundToGameplayAttributes(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayAttribute& BaseAttribute,

@@ -12,6 +12,8 @@
 #include "GAS/CAttributeSet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 #include "Widgets/COverHeadStatsGauge.h"
 
 
@@ -26,6 +28,8 @@ ACCharacter::ACCharacter()
 	OverHeadWidgetComponent->SetupAttachment(GetRootComponent());
 
 	BindGASChangeDelegates();
+	
+	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("PerceptionStimuliSourceComponent"));
 }
 
 void ACCharacter::BeginPlay()
@@ -33,6 +37,11 @@ void ACCharacter::BeginPlay()
 	Super::BeginPlay();
 	ConfigureOverHeadWidget();
 	RelativeMeshTransform = GetMesh()->GetRelativeTransform();
+
+	if (PerceptionStimuliSourceComponent)
+	{
+		PerceptionStimuliSourceComponent.Get()->RegisterForSense(UAISense_Sight::StaticClass());
+	}
 }
 
 void ACCharacter::ServerSideInit()
@@ -154,9 +163,25 @@ void ACCharacter::SetStatusGaugeEnabled(const bool bIsEnabled)
 	}
 }
 
+bool ACCharacter::IsDead() const
+{
+	return GetAbilitySystemComponent()->HasMatchingGameplayTag(CGameplayTags::Dead.GetTag());
+}
+
+void ACCharacter::RespawnImmediately()
+{
+	if (HasAuthority())
+	{
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(CGameplayTags::Dead.GetTag()));
+	}
+}
+
 void ACCharacter::OnDeathMontageFinished()
 {
-	SetRagdollEnabled(true);
+	if (IsDead())
+	{
+		SetRagdollEnabled(true);
+	}
 }
 
 void ACCharacter::SetRagdollEnabled(bool bIsEnabled)
@@ -188,17 +213,24 @@ void ACCharacter::PlayDeathAnimation()
 void ACCharacter::StartDeathSequence()
 {
 	OnDeath();
+
+	if (CAbilitySystemComponent)
+	{
+		CAbilitySystemComponent->CancelAllAbilities();
+	}
 	
 	PlayDeathAnimation();
 	SetStatusGaugeEnabled(false);
 	
 	GetCharacterMovement()->SetMovementMode(MOVE_None);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetAIPerceptionStimuliSourceEnabled(false);
 }
 
 void ACCharacter::Respawn()
 {
 	OnRespawn();
+	SetAIPerceptionStimuliSourceEnabled(true);
 	SetRagdollEnabled(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -236,4 +268,25 @@ void ACCharacter::SetGenericTeamId(const FGenericTeamId& NewTeamID)
 FGenericTeamId ACCharacter::GetGenericTeamId() const
 {
 	return TeamId;
+}
+
+void ACCharacter::OnRep_TeamID()
+{
+}
+
+void ACCharacter::SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled)
+{
+	if (!PerceptionStimuliSourceComponent)
+	{
+		return;
+	}
+
+	if (bIsEnabled)
+	{
+		PerceptionStimuliSourceComponent.Get()->RegisterWithPerceptionSystem();
+	}
+	else
+	{
+		PerceptionStimuliSourceComponent.Get()->UnregisterFromPerceptionSystem();
+	}
 }
